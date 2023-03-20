@@ -1,10 +1,32 @@
-on: [pull_request]
+name: assign-me
+on:
+  pull_request:
+    types: [opened, synchronize]
 
 jobs:
-  assign_me:
-     runs-on: ubuntu-latest
-     name: Assign me
-     steps:
-      - uses: RubGonExp/assign-me@v1.0.0
-     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  assign:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: assign-me
+        uses: actions/github-script@v4
+        env:
+          USER_FILE: ${{ secrets.USER_FILE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { context, github } = require('@actions/github');
+            const fs = require('fs');
+            const users = fs.readFileSync(process.env.USER_FILE, 'utf8');
+            const { pull_request } = context.payload;
+            const user = users.users[Math.abs(pull_request.number) % users.users.length];
+
+            github.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pull_request.number,
+              assignees: [user.username]
+            });
