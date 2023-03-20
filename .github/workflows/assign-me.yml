@@ -9,24 +9,35 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: assign-me
-        uses: actions/github-script@v4
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+          
+      - name: Install dependencies
+        run: npm install fs @actions/core @actions/github
+        
+      - name: Assign PR
         env:
           USER_FILE: ${{ secrets.USER_FILE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { context, github } = require('@actions/github');
-            const fs = require('fs');
-            const users = fs.readFileSync(process.env.USER_FILE, 'utf8');
-            const { pull_request } = context.payload;
-            const user = users.users[Math.abs(pull_request.number) % users.users.length];
-
-            github.issues.addAssignees({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: pull_request.number,
-              assignees: [user.username]
-            });
+        run: |
+          const core = require('@actions/core');
+          const github = require('@actions/github');
+          const fs = require('fs');
+          
+          const users = fs.readFileSync(process.env.USER_FILE, 'utf8');
+          const { pull_request } = github.context.payload;
+          const user = users.users[Math.abs(pull_request.number) % users.users.length];
+        
+          const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+          const { owner, repo } = github.context.repo;
+          const issue_number = pull_request.number;
+          
+          octokit.issues.addAssignees({
+            owner: owner,
+            repo: repo,
+            issue_number: issue_number,
+            assignees: [user.username]
+          });
