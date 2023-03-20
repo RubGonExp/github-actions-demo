@@ -1,7 +1,7 @@
 name: assign-me
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, edited, synchronize]
 
 jobs:
   assign:
