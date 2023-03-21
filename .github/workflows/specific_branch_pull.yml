@@ -1,0 +1,10 @@
+on:
+  pull_request:
+    types:
+      - opened
+jobs:
+  run_if:
+    if:  startsWith(github.head_ref, 'prueba1/')
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "The head of this PR starts with 'prueba1/'"
