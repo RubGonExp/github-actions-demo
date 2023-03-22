@@ -1,28 +1,15 @@
-# This is a basic workflow to help you get started with Actions
-
-name: message-push
-
-# Controls when the workflow will run
+name: Notify on Merge
 on:
-  push:
-    branches:
-      - main
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+  pull_request:
+    types: [closed]
 jobs:
-  generate-message:
+  notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Get commit author
-        run: echo "COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')" >> $GITHUB_ENV
-      - name: Generate message
-        run: echo "${COMMIT_AUTHOR} ha mergeado en main"
-      - name: Post message to pull request
-        uses: peter-evans/create-pull-request-comment@v3
-        with:
-          body: |
-            ${COMMIT_AUTHOR} ha mergeado en main
-
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Send notification
+      if: github.event.pull_request.merged && github.event.pull_request.base.ref == 'main'
+      env:
+        USER: ${{ github.actor }}
+      run: echo "${USER} ha mergeado en main" | gh pr review ${{ github.event.pull_request.number }} --body -
