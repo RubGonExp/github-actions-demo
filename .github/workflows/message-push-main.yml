@@ -1,0 +1,15 @@
+name: Notify on Merge
+on:
+  pull_request:
+    types: [closed]
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Send notification
+      if: github.event.pull_request.merged && github.event.pull_request.base.ref == 'main'
+      env:
+        USER: ${{ github.actor }}
+      run: echo "${USER} ha mergeado en main" | gh pr review ${{ github.event.pull_request.number }} --body -
