@@ -1,0 +1,24 @@
+name: Eco de campos de pull request
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  echo-pull-request-fields:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Echo rama
+      run: echo "Rama: ${{ github.head_ref }}"
+    - name: Echo ID de incidencia
+      run: echo "ID de incidencia: $(echo ${GITHUB_REF#refs/heads/} | cut -d/ -f1)"
+    - name: Echo ID de rama
+      run: echo "ID de rama: $(echo ${GITHUB_REF#refs/heads/} | cut -d/ -f2)"
+    - name: Buscar dirección https en el cuerpo del pull request
+      id: buscar-direccion
+      run: echo "::set-output name=direccion::$(echo ${{ github.event.pull_request.body }} | grep -Eio 'https?://[^[:space:]]+' | head -n1)"
+    - name: Extraer dirección https del resultado
+      id: extraer-direccion
+      run: echo "::set-output name=direccion::$(echo ${{ steps.buscar-direccion.outputs.direccion }} | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+    - name: Echo dirección https
+      run: echo "Dirección https: ${{ steps.extraer-direccion.outputs.direccion }}"
