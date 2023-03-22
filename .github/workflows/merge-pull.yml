@@ -1,4 +1,4 @@
-name: Merge Comment
+name: Merge pull Comment
 on:
   pull_request:
     types: [closed]
@@ -17,14 +17,17 @@ jobs:
         run: echo 'I have merged into main.' > body.txt
       - name: Get Pull Request Information
         id: pr-info
-        uses: peter-evans/get-pull-request@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          pull_request_number: ${{ github.event.pull_request.number }}
+        run: |
+          PR_NUMBER=$(cat pr_number.txt)
+          URL="https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}"
+          PR_URL=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" $URL | jq -r '.url')
+          echo "::set-output name=pull-request-url::$PR_URL"
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Comment
         run: |
           PR_NUMBER=$(cat pr_number.txt)
           BODY=$(cat body.txt)
           COMMENTS_URL=$(echo "${{ steps.pr-info.outputs.pull-request-url }}/comments")
-          API_URL=$(echo $COMMENTS_URL | sed 's|https://api.github.com||')
-          curl -XPOST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -d "{\"body\": \"$BODY\"}" $API_URL
+          curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -X POST -d "{\"body\":\"$BODY\"}" $COMMENTS_URL
