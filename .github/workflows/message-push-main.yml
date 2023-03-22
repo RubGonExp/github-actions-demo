@@ -16,4 +16,4 @@ jobs:
         env:
           USER: ${{ github.actor }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: echo "${USER} ha mergeado en main" | gh pr review ${{ github.event.pull_request.number }} --body -
+        run: echo "${USER} ha mergeado en main" | gh pr review ${{ github.event.pull_request.number }} --comment --body "${USER} ha mergeado en main"
