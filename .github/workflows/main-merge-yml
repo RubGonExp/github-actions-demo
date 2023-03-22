@@ -1,0 +1,27 @@
+name: Merge to main
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Merge
+        run: git merge ${{ github.event.pull_request.head.ref }}
+
+      - name: Comment
+        uses: actions/github-script@v3
+        with:
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              body: 'He mergeado en main'
+            })
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
