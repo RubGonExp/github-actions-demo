@@ -1,0 +1,30 @@
+name: Merge Comment
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+jobs:
+  merge-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Get Pull Request Number
+        id: pr
+        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
+      - name: Get Comment Body
+        id: body
+        run: echo 'I have merged into main.' > body.txt
+      - name: Get Pull Request Information
+        id: pr-info
+        uses: peter-evans/get-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull_request_number: ${{ github.event.pull_request.number }}
+      - name: Create Comment
+        run: |
+          PR_NUMBER=$(cat pr_number.txt)
+          BODY=$(cat body.txt)
+          COMMENTS_URL=$(echo "${{ steps.pr-info.outputs.pull-request-url }}/comments")
+          API_URL=$(echo $COMMENTS_URL | sed 's|https://api.github.com||')
+          curl -XPOST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -d "{\"body\": \"$BODY\"}" $API_URL
