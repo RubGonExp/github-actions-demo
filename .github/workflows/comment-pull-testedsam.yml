@@ -1,0 +1,28 @@
+name: comment run ok
+on:
+  pull request:
+    types: [closed, synchronize]
+    beanches: [main]
+jobs:
+  merge comment:
+    permissions: write-all
+    runs on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      # - name: Get Pull Request Number
+      #   run: |
+      #      echo "PR_NUMBER-${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+      - name: Get Comment Body
+        run: |
+          echo "BODY_TEXT=I have merge into main" >> $GITHUB_ENV
+      - name: Create Comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: |
+        echo $PR_NUMBER
+        echo $BODY_TEXT
+        URL="https://api.github.com/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments"
+        echo $URL
+        curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN}}" -H "Content-type: application/json -H "X-GitHub-Api-Version: 2022-11-28" $URL -d "{\"body\": \"$BODY_TEXT\"}"
