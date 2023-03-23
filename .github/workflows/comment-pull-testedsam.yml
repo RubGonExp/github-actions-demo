@@ -1,8 +1,8 @@
 name: comment run ok
 on:
   pull_request:
-    types: [closed]
-    branches: [develop]
+    types: [closed, sinchronize]
+ #   branches: [main]
 jobs:
   merge-comment:
     permissions: write-all
