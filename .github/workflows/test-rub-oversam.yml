@@ -1,4 +1,4 @@
-name: comment run ok
+name: comment test2
 on:
   pull_request:
     types: [closed, sinchronize]
