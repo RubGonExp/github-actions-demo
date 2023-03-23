@@ -1,12 +1,12 @@
 name: comment run ok
 on:
-  pull request:
+  pull_request:
     types: [closed, synchronize]
     beanches: [main]
 jobs:
-  merge comment:
+  merge-comment:
     permissions: write-all
-    runs on: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
