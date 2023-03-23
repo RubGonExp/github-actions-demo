@@ -1,0 +1,21 @@
+name: test rub ok
+on:
+  pull_request:
+    types: [closed, sinchronize]
+ #   branches: [main]
+jobs:
+  merge-comment:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Create Comment
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            PR_NUMBER: ${{ github.event.pull_request.number }}
+            BODY_TEXT: I have merge ${{ github.ref }} by user ${{ github.event.pull_request.user.login }}
+        run: |
+          URL="https://api.github.com/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments"
+          curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" $URL -d "{\"body\": \"$BODY_TEXT\"}"
+
