@@ -15,7 +15,7 @@ jobs:
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             PR_NUMBER: ${{ github.event.pull_request.number }}
-            BODY_TEXT: Branch ${{ github.event.pull_request.base.ref }} merged over ${{ github.event.pull_request.head.ref }} by user ${{ github.event.pull_request.user.login }} and merged by ${{ github.event.pull_request.merged_by.login }}
+            BODY_TEXT: Branch ${{ github.event.pull_request.head.ref }} merged over ${{ github.event.pull_request.base.ref }} by user ${{ github.event.pull_request.user.login }} and merged by ${{ github.event.pull_request.merged_by.login }}
         run: |
           URL="https://api.github.com/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments"
           curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" $URL -d "{\"body\": \"$BODY_TEXT\"}"
