@@ -2,8 +2,6 @@ name: test rub ok
 on:
   pull_request:
     types: [closed, synchronize]
-env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   merge-comment:
     permissions: write-all
@@ -13,9 +11,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Extract Issue URLs from PR body
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BODY_TEXT: ${{ github.event.pull_request.body }}
         id: extract-issue-urls
         run: |
-          BODY_TEXT=$(echo "${{ github.event.pull_request.body }}" | tr -d '\r')
           urls=$(echo "$BODY_TEXT" | grep -oP '(?<=\().*?(?=\))')
           if [ -n "$urls" ]; then
           echo "urls=${urls}" >> $GITHUB_ENV
