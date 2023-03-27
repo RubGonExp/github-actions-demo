@@ -13,7 +13,7 @@ jobs:
       - name: Extract Issue URLs from PR body
         id: extract-issue-urls
         run: |
-          BODY_TEXT="${{ github.event.pull_request.body }}"
+          BODY_TEXT= ${{ github.event.pull_request.body }}
           urls=$(echo "$BODY_TEXT" | grep -oP '(?<=\().*?(?=\))')
           echo "::set-output name=urls::$urls"
       - name: Add comment to issues
