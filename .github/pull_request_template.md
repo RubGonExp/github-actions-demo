@@ -11,7 +11,6 @@
 
 ## Types of changes
 <!--- Please select what the change is: -->
-- [ ] New feature (non breaking change which adds functionality)
 - [ ] Refactor (update of libraries or refactor of code)
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] Breaking change (fix or feature that would cause existing functionality to change)
