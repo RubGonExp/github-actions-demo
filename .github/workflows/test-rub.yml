@@ -21,7 +21,7 @@ jobs:
           BODY_TEXT="${{ github.event.pull_request.body }}"
           urls=$(echo "$BODY_TEXT" | grep -oP '(?<=\().*?(?=\))')
           echo "urls=${urls}" >> $GITHUB_ENV
-          echo "$GITHUB_ENV"
+          cat $GITHUB_ENV
     #  - name: Add comment to issues
      #   env:
       #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
