@@ -12,9 +12,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: pr body
-        run: |
-          echo "PR body: ${{ github.event.pull_request.body }}"
       - name: Extract Issue URLs from PR body
         id: extract-issue-urls
         run: |
