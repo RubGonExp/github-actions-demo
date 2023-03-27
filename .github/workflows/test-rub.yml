@@ -10,12 +10,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: pr body
+        run: |
+          echo "PR body: ${{ github.event.pull_request.body }}"
       - name: Extract Issue URLs from PR body
         id: extract-issue-urls
         run: |
           BODY_TEXT="${{ github.event.pull_request.body }}"
           urls=$(echo "$BODY_TEXT" | grep -oP '(?<=\().*?github\.com\/.*?\/.*?\/\d+(?=\))')
-          echo "$urls"
+          echo "::set-output name=urls::$urls"
     #  - name: Add comment to issues
      #   env:
       #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
