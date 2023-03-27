@@ -17,7 +17,7 @@ jobs:
         id: extract-issue-urls
         run: |
           BODY_TEXT="${{ github.event.pull_request.body }}"
-          urls=$(echo "$BODY_TEXT" | grep -oP '(?<=\().*?github\.com\/.*?\/.*?\/\d+(?=\))')
+          urls=$(echo "$BODY_TEXT" | grep -oP '(\d+(?=\)$)')
           echo "::set-output name=urls::$urls"
     #  - name: Add comment to issues
      #   env:
