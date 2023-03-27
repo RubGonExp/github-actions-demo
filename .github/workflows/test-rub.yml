@@ -15,7 +15,7 @@ jobs:
         run: |
           BODY_TEXT="${{ github.event.pull_request.body }}"
           urls=$(echo "$BODY_TEXT" | grep -oP '(?<=\().*?(?=\))')
-          echo "::set-output name=urls::$urls"
+          echo "$urls"
     #  - name: Add comment to issues
      #   env:
       #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
