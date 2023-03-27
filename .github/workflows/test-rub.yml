@@ -14,7 +14,7 @@ jobs:
         id: extract-issue-urls
         run: |
           for url in $(echo $BODY_TEXT | tr ' ' '\n'); do
-            urls=$(echo "$url" | grep -oP '(?<=\().*?(?=\))')
+            urls=$(echo "$BODY_TEXT" | grep -oP '(?<=\().*?(?=\))')
           done
 
       - name: Print url
