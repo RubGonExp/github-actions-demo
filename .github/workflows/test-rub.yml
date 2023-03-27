@@ -1,0 +1,30 @@
+name: test rub ok
+on:
+  pull_request:
+    types: [closed, synchronize]
+jobs:
+  merge-comment:
+    permissions: write-all
+    runs-on: ubuntu-latest
+   # if: github.event.pull_request.base.ref == 'main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Extract Issue URLs from PR body
+        id: extract-issue-urls
+        run: |
+          body_text="${{ github.event.pull_request.body }}"
+          urls=$(echo "$body_text" | grep -oP '(?<=\().*?(?=\))')
+          echo "::set-output name=urls::$urls"
+      - name: Add comment to issues
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BODY_TEXT: Branch ${{ github.event.pull_request.head.ref }} merged over ${{ github.event.pull_request.base.ref }} by user ${{ github.event.pull_request.user.login }} and merged by ${{ github.event.pull_request.merged_by.login }}
+        run: |
+          for url in $(echo ${{ steps.extract-issue-urls.outputs.urls }} | tr ' ' '\n'); do
+            url=$(echo "$url" | sed 's/,//g')
+            issue_number=$(echo "$url" | awk -F'/' '{print $NF}')
+            issue_comment_url="https://api.github.com/repos/${{ github.repository }}/issues/${issue_number}/comments"
+            curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" $issue_comment_url -d "{\"body\": \"$BODY_TEXT\"}"
+          done
