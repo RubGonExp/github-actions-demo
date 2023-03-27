@@ -18,8 +18,8 @@ jobs:
         run: |
           for url in $(echo $BODY_TEXT | tr ' ' '\n'); do
           urls=$(echo "$BODY_TEXT" | grep -oP '(?<=\().*?(?=\))')
-      - name: Print GITHUB_ENV
-        run: cat $GITHUB_ENV
+      - name: Print url
+        run: cat $urls
     #  - name: Add comment to issues
      #   env:
       #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
