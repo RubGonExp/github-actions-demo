@@ -13,14 +13,14 @@ jobs:
       - name: Extract Issue URLs from PR body
         id: extract-issue-urls
         run: |
-          body_text="${{ github.event.pull_request.body }}"
-          urls=$(echo "$body_text" | grep -oP '(?<=\().*?(?=\))')
+          BODY_TEXT="${{ github.event.pull_request.body }}"
+          urls=$(echo "$BODY_TEXT" | grep -oP '(?<=\().*?(?=\))')
           echo "::set-output name=urls::$urls"
       - name: Add comment to issues
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          BODY_TEXT: Branch ${{ github.event.pull_request.head.ref }} merged over ${{ github.event.pull_request.base.ref }} by user ${{ github.event.pull_request.user.login }} and merged by ${{ github.event.pull_request.merged_by.login }}
+          # BODY_TEXT: Branch ${{ github.event.pull_request.head.ref }} merged over ${{ github.event.pull_request.base.ref }} by user ${{ github.event.pull_request.user.login }} and merged by ${{ github.event.pull_request.merged_by.login }}
         run: |
           for url in $(echo ${{ steps.extract-issue-urls.outputs.urls }} | tr ' ' '\n'); do
             url=$(echo "$url" | sed 's/,//g')
