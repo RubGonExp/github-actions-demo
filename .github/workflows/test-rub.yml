@@ -1,26 +1,31 @@
 name: test rub ok
+
 on:
   pull_request:
     types: [closed, synchronize]
+
 env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-   # body_text: ${{ github.event.pull_request.body }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   merge-comment:
     permissions: write-all
     runs-on: ubuntu-latest
-   # if: github.event.pull_request.base.ref == 'main'
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Extract URL from PR body
         id: extract-url
         run: |
           body_text=$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')
-          echo $body_text
+          echo "$body_text"
           urls=$(echo "$body_text" | grep -oP 'https?://[^\s]+\b(?:\([^)]*\))?')
-          echo $urls
+          echo "$urls"
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])')
+          echo "$issue_numbers"
+        shell: bash
 
     #  - name: Add comment to issues
      #   env:
