@@ -31,7 +31,7 @@ jobs:
           fi
       - name: Generate URL for comments
         env:
-          TEXT: Branch ${{ github.event.pull_request.head.ref }} merged over ${{ github.event.pull_request.base.ref }} by user ${{ github.event.pull_request.user.login }} and merged by ${{ github.event.pull_request.merged_by.login }}
+          TEXT: Hola caracola
         run: |
-          URL="https://api.github.com/repos/${{ github.repository }}/issues/$issue_numbers/comments"
+          URL="https://api.github.com/repos/${{ github.repository }}/issues/${issue_numbers}/comments"
           curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" $URL -d "{\"body\": \"$TEXT\"}"
