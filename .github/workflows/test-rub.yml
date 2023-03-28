@@ -16,7 +16,8 @@ jobs:
       - name: Extract Issue URLs from PR body
         id: extract-issue-urls
         run:
-          urls=$(echo "$BODY_TEXT" | grep -oP 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
+          BODY_TEXT=${{ github.event.pull_request.body }} 
+          urls=$(echo "$body_text" | grep -oP '(?<=\().*?(?=\))')
       - name: Print url
         run: echo $urls
 
