@@ -4,7 +4,7 @@ on:
     types: [closed, synchronize]
 env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    body_text: ${{ github.event.pull_request.body }}
+   # body_text: ${{ github.event.pull_request.body }}
 jobs:
   merge-comment:
     permissions: write-all
@@ -13,11 +13,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Extract Issue URLs from PR body
-        id: extract-issue-urls
+      - name: Extract URL from PR body
+        id: extract-url
         run: |
-          urls=$(echo "$body_text" | grep -oP '(?<=\().*?(?=\))')
-          echo $urls
+          body_text=$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')
+          url=$(echo "$body_text" | grep -oP '(?<=\()(.*?)(?=\))' | grep -oP '(?<=\:\/\/)[^\/\s]+(?:\/[^\s]*)?')
+          echo $url
+
 
     #  - name: Add comment to issues
      #   env:
