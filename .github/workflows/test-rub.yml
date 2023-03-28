@@ -29,6 +29,11 @@ jobs:
            else
             echo "$issue_numbers"
           fi
+      - name: Obtener número de issue
+        id: numero-issue
+        run: |
+          NUMERO_ISSUE=$(echo "$urls" | grep -oP "/\\K\\d+")
+          echo "$NUMERO_ISSUE"
       - name: Generate URL for comments
         env:
           TEXT: Hola caracola
