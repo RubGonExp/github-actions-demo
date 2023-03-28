@@ -31,7 +31,7 @@ jobs:
           fi
       - name: Generate URL for comments
         run: |
-          url_comments=$(echo "$urls" | sed 's/github\.com\/\([^\/]*\)\/\([^\/]*\)\/issues\/\([0-9]*\)/api.github.com\/repos\/\1\/\2\/issues\/\3\/comments/')
+          url_comments="https://api.github.com/repos/${{ github.repository }}/issues/$issue_numbers/comments"
           echo "URL for comments: $url_comments"
       - name: Add comment
         run: |
