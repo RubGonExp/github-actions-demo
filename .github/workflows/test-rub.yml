@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Extract URL from PR body
+      - name: Extract-URL from PR body
         id: extract-url
         run: |
           body_text="$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')"
@@ -32,7 +32,7 @@ jobs:
       - name: Obtener número de issue
         id: numero-issue
         run: |
-          NUMERO_ISSUE=$(echo "$urls" | grep -oP "/\\K\\d+")
+          NUMERO_ISSUE=$(echo "${{ steps.extract-url.outputs.urls }}$" | grep -oP "/\\K\\d+")
           echo "$NUMERO_ISSUE"
       - name: Generate URL for comments
         env:
