@@ -4,7 +4,7 @@ on:
     types: [closed, synchronize]
 env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    BODY_TEXT: ${{ github.event.pull_request.body }}
+    body_text: ${{ github.event.pull_request.body }}
 jobs:
   merge-comment:
     permissions: write-all
@@ -16,7 +16,6 @@ jobs:
       - name: Extract Issue URLs from PR body
         id: extract-issue-urls
         run: |
-          body_text=$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')
           urls=$(echo "$body_text" | grep -oP '(?<=\().*?(?=\))')
           echo $urls
 
