@@ -18,10 +18,7 @@ jobs:
         run: |
           body_text=$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')
           url=$(echo "$body_text" | grep -oP '(?<=\()(.*?)(?=\))' | grep -oP '(?<=\:\/\/)[^\/\s]+(?:\/[^\s]*)?')
-      - name: Show URL from PR body
-        id: see-url
-        run: |
-            echo $url
+          echo $url
 
 
     #  - name: Add comment to issues
