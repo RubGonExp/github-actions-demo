@@ -17,22 +17,10 @@ jobs:
         id: extract-url
         run: |
           body_text=$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')
-          url=$(echo "$body_text" | grep -oP '(?<=\()(.*?)(?=\))' | grep -oP '(?<=\:\/\/)[^\/\s]+(?:\/[^\s]*)?')
-          echo $url
-       # Extract issue number from URL
-      - name: Extract issue number
-        id: extract-issue-number
-        run: |
-          issue_number=$(echo "$url" | awk -F/ '{print $NF}')
-          echo "Issue number: $issue_number"
-
-        # Add comment to issue
-      - name: Add comment to issue
-        uses: peter-evans/create-or-update-comment@v2
-        with:
-          issue-number: ${{ steps.extract-issue-number.outputs.issue_number }}
-          body: "¡Hola! Este es un comentario agregado automáticamente por una acción de GitHub."
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo $body_text
+          urls=$(echo "$body_text" | grep -oP 'https?://[^\s]+\b(?:\([^)]*\))?')
+          echo $urls
+          issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])')
 
     #  - name: Add comment to issues
      #   env:
