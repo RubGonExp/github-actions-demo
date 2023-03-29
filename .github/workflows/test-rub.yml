@@ -29,11 +29,13 @@ jobs:
            else
             echo "$issue_numbers"
           fi
+          echo "Output [$urls]"
+          echo "urls=$urls" >> $GITHUB_OUTPUT
       - name: Obtener número de issue
         id: numero-issue
         run: |
-          echo "Output [${{ steps.extract-url.outputs.urls }}]"
-          NUMERO_ISSUE=$(echo "Output [${{ steps.extract-url.outputs.urls }}]" | grep -oP "/\\K\\d+")
+          echo "Output [${{steps.extract-url.outputs.urls}}]"
+          NUMERO_ISSUE=$(echo "Output [${{steps.extract-url.outputs.urls}}]" | grep -oP "/\\K\\d+")
           echo "$NUMERO_ISSUE"
 
       - name: Generate URL for comments
