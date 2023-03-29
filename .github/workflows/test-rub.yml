@@ -32,7 +32,7 @@ jobs:
       - name: Obtener número de issue
         id: numero-issue
         run: |
-          NUMERO_ISSUE=$(echo "${{ steps.extract-url.outputs.urls }}$" | grep -oP "/\\K\\d+")
+          NUMERO_ISSUE=$(echo "${{ steps.extract-url.outputs.urls }}" | grep -oP "/\\K\\d+")
           echo "$NUMERO_ISSUE"
       - name: Generate URL for comments
         env:
