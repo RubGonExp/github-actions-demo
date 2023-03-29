@@ -25,6 +25,7 @@ jobs:
           echo "$urls"
           echo "$urls" | sed 's|https://github.com/|https://api.github.com/repos/|; s|$|/comments|'
       - name: Procesar URLs
+        id: proccess-url
         run: |
           urls=(
             "https://github.com/RubGonExp/github-actions-demo/issues/46"
