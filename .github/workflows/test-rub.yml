@@ -37,10 +37,12 @@ jobs:
           echo "Output [${{steps.extract-url.outputs.urls}}]"
           NUMERO_ISSUE=$(echo "Output [${{steps.extract-url.outputs.urls}}]" | grep -oP "/\\K\\d+")
           echo "$NUMERO_ISSUE"
+          echo "Output [$NUMERO_ISSUE]"
+          echo "NUMERO_ISSUE=$NUMERO_ISSUE" >> $GITHUB_OUTPUT
 
       - name: Generate URL for comments
         env:
           TEXT: Hola caracola
         run: |
-          URL="https://api.github.com/repos/${{ github.repository }}/issues/${issue_numbers}/comments"
+          URL="https://api.github.com/repos/${{ github.repository }}/issues/Output [${{steps.numero-issue.outputs.NUMERO_ISSUE}}]/comments"
           curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" $URL -d "{\"body\": \"$TEXT\"}"
