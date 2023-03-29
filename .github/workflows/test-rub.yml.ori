@@ -1,0 +1,46 @@
+name: test rub ok
+
+on:
+  pull_request:
+    types: [closed, synchronize]
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  merge-comment:
+    permissions: write-all
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Extract-URL from PR body
+        id: extract-url
+        run: |
+          body_text="$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')"
+          echo "$body_text"
+          urls="$(echo "$body_text" | grep -oP 'https?://[^\s]+\b(?:\([^)]*\))?')"
+          echo "$urls"
+          issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])')
+          if [ -z "$issue_numbers" ]; then
+            echo "No issue numbers found."
+           else
+            echo "$issue_numbers"
+          fi
+          echo "urls=$urls" >> $GITHUB_OUTPUT
+          
+      - name: Obtener número de issue
+        id: numero-issue
+        run: |
+          NUMERO_ISSUE=$(echo "${{steps.extract-url.outputs.urls}}" | grep -oP "/\\K\\d+")
+          echo "$NUMERO_ISSUE"
+          echo "NUMERO_ISSUE=$NUMERO_ISSUE" >> $GITHUB_OUTPUT
+
+      - name: Generate URL for comments
+        env:
+          TEXT: Hola caracola
+        run: |
+          URL="https://api.github.com/repos/${{ github.repository }}/issues/${{steps.numero-issue.outputs.NUMERO_ISSUE}}/comments"
+          curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" $URL -d "{\"body\": \"$TEXT\"}"
