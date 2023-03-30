@@ -23,18 +23,14 @@ jobs:
           echo "$body_text"
           urls="$(echo "$body_text" | grep -oP 'https?://[^\s]+\b(?:\([^)]*\))?')"
           echo "$urls"
+          urls_count=0
           for url in "${urls[@]}"; do
-          modifiedurl=$(echo "$url" | sed 's|https://github.com/|https://api.github.com/repos/|; s|$|/comments|')
-          echo "$modifiedurl"
-          done
-          issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])')
-          if [ -z "$issue_numbers" ]; then
-            echo "No issue numbers found."
-           else
-            echo "$issue_numbers"
-          fi
-          for url in "${modifiedurl[@]}"; do
-            echo "modifiedurl=$url" >> $GITHUB_OUTPUT
+            modifiedurl=$(echo "$url" | sed 's|https://github.com/|https://api.github.com/repos/|; s|$|/comments|')
+            echo "$modifiedurl"
+            urls_count=$((urls_count+1))
+            var_name="url_$urls_count"
+            echo "$var_name=$modifiedurl" >> $GITHUB_ENV
+            echo "$var_name=$modifiedurl" >> $GITHUB_OUTPUT
           done
           
       - name: Obtener número de issue
