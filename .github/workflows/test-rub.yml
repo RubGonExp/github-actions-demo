@@ -6,6 +6,7 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  TEXT: Hola caracola
 
 jobs:
   merge-comment:
@@ -27,23 +28,16 @@ jobs:
           modifiedurl=$(echo "$url" | sed 's|https://github.com/|https://api.github.com/repos/|; s|$|/comments|')
           echo "$modifiedurl"
           done
-          issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])')
+          issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
           if [ -z "$issue_numbers" ]; then
             echo "No issue numbers found."
            else
             echo "$issue_numbers"
           fi
-          
-      - name: Obtener número de issue
-        id: numero-issue
-        run: |
-          NUMERO_ISSUE=$(echo "${{steps.extract-url.outputs.urls}}" | grep -oP "/\\K\\d+")
-          echo "$NUMERO_ISSUE"
-          echo "NUMERO_ISSUE=$NUMERO_ISSUE" >> $GITHUB_OUTPUT
 
-      - name: Generate URL for comments
-        env:
-          TEXT: Hola caracola
-        run: |
-          URL="https://api.github.com/repos/${{ github.repository }}/issues/${{steps.numero-issue.outputs.NUMERO_ISSUE}}/comments"
-          curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" $URL -d "{\"body\": \"$TEXT\"}"
+      #- name: Generate URL for comments
+      #  env:
+          
+     #   run: |
+      #    URL="https://api.github.com/repos/${{ github.repository }}/issues/${{steps.numero-issue.outputs.NUMERO_ISSUE}}/comments"
+       #   curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" $URL -d "{\"body\": \"$TEXT\"}"
