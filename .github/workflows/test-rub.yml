@@ -6,6 +6,7 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  TEXT: Hola caracola
 
 jobs:
   merge-comment:
@@ -33,11 +34,6 @@ jobs:
            else
             echo "$issue_numbers"
           fi
-
-      - name: Enviar comentarios a las URLs
-        env:
-          TEXT: Hola caracola
-        run: |
           echo "$modifiedurl"
           for url in $modifiedurl
           do
