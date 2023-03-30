@@ -33,7 +33,9 @@ jobs:
            else
             echo "$issue_numbers"
           fi
-          echo "urls=$urls" >> $GITHUB_OUTPUT
+          for url in "${modifiedurl[@]}"; do
+            echo "$url" >> $GITHUB_OUTPUT
+          done
           
       - name: Obtener número de issue
         id: numero-issue
