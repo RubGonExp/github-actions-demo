@@ -36,7 +36,8 @@ jobs:
           fi
           IFS=$'\n' read -d '' -ra MY_URLS <<< "$modifiedurl"
           for URL in "${MY_URLS[@]}"; do
-            curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$URL" -d "{\"body\": \"$TEXT\"}"
+            echo "Enviando mensaje a $URL"
+            curl -X POST -H "Authorization: ***" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$URL" -d "{\"body\": \"$TEXT\"}"
           done
 
       #- name: Generate URL for comments
