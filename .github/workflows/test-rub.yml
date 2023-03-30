@@ -34,8 +34,16 @@ jobs:
            else
             echo "$issue_numbers"
           fi
-          urlscur=$(echo $modifiedurl | tr " " "\n")
+      - name: Separar las URLs de los comentarios
+        run: |
+          urlscur=$(echo $modifiedurl | tr " " ",")
+          echo "URLs separadas:"
+          echo "$urlscur"
+
+      - name: Enviar comentarios a las URLs
+        run: |
           for url in $urlscur
           do
-            curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urlscur" -d "{\"body\": \"$TEXT\"}"
+            echo "Enviando comentario a $url"
+            curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" -d "{\"body\": \"$TEXT\"}"
           done
