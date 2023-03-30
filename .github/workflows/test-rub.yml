@@ -40,14 +40,9 @@ jobs:
           body_text="$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')"
             echo "$body_text"
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
-          if [ -z "$issue_numbers" ]; then
-            echo "No issue numbers found."
-           else
-            echo "$issue_numbers"
-          fi
-          for issue_number in "${issue_numbers[@]}"; do
-          urlisnum="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number/comments"
-          echo "$urlisnum"
+          echo "$issue_numbers"
+          for isnum in "${issue_numbers[@]}"; do
+          urlisnum="https://api.github.com/repos/${{ github.repository }}/issues/$isnum/comments"
           done
           echo "$urlisnum"
           for url in $urlisnum
