@@ -42,7 +42,7 @@ jobs:
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
           echo "$issue_numbers"
           for issue_number in $issue_numbers; do
-            url="https://api.github.com//repos/${{ github.repository }}/issues/$issue_number/comments"
+            url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number/comments"
             echo "$url"
             echo "Enviando comentario a $url"
             URL="$url"
