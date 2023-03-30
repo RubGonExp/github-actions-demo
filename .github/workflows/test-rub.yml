@@ -42,9 +42,8 @@ jobs:
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
           echo "$issue_numbers"
           for issue_number in $issue_numbers; do
-            url="https://github.com/${{ github.repository }}/issues/$issue_number/comments"
-            modified_url=$(echo "$url" | sed "s|https://github.com/|https://api.github.com/repos/|; s|/issues/|/issues/comments/|")
-            echo "$modified_url"
-            URL="$modified_url"
-            curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$modified_url" -d "{\"body\": \"$TEXT\"}"
+            url="https://api.github.com//repos/${{ github.repository }}/issues/$issue_number/comments"
+            echo "$url"
+            URL="$url"
+            curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" -d "{\"body\": \"$TEXT\"}"
           done
