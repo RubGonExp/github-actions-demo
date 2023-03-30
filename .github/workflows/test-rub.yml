@@ -22,7 +22,7 @@ jobs:
           TEXT: Texto de prueba en issue asociado a pull request
         run: |
           body_text="$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')"
-          urls="$(echo "$body_text" | grep -oP 'https?://[^\s]+\b(?:\([^)]*\))?')"
+          urls="$(echo "$body_text" | grep -oP 'https://(api\.)?github\.com/[^\s]+\b(?:\([^)]*\))?')"
           for url in "${urls[@]}"; do
           modifiedurl=$(echo "$url" | sed 's|https://github.com/|https://api.github.com/repos/|; s|$|/comments|')
           done
