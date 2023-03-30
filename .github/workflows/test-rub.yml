@@ -45,9 +45,9 @@ jobs:
            else
             echo "$issue_numbers"
           fi
-          for issue_number in $issue_numbers; do
-            urlisnum="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number/comments"
-            echo "$urlisnum"
+          for issue_number in "${issue_numbers[@]}"; do
+          urlisnum="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number/comments"
+          echo "$urlisnum"
           done
           echo "$urlisnum"
           for url in $urlisnum
