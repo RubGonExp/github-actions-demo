@@ -26,7 +26,6 @@ jobs:
           echo "$urls"
           for url in "${urls[@]}"; do
           modifiedurl=$(echo "$url" | sed 's|https://github.com/|https://api.github.com/repos/|; s|$|/comments|')
-          echo "$modifiedurl"
           done
           echo "$modifiedurl"
           for url in $modifiedurl
@@ -48,9 +47,8 @@ jobs:
           fi
           for issue_number in $issue_numbers; do
             urlisnum="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number/comments"
-            echo "$urlisnum"
           done
-
+          echo "$urlisnum"
           for url in $urlisnum
           do
             echo "Enviando comentario a $url"
