@@ -23,7 +23,8 @@ jobs:
           echo "$body_text"
           urls="$(echo "$body_text" | grep -oP 'https?://[^\s]+\b(?:\([^)]*\))?')"
           echo "$urls"
-          echo "$urls" | sed 's|https://github.com/|https://api.github.com/repos/|; s|$|/comments|'
+          urlsgh="(echo "$urls" | sed 's|https://github.com/|https://api.github.com/repos/|; s|$|/comments|'
+          echo "$urlsgh"
       - name: Procesar URLs
         id: proccess-url
         run: |
