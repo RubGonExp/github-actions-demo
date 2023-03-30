@@ -34,20 +34,8 @@ jobs:
            else
             echo "$issue_numbers"
           fi
-          IFS=$'\n' read -d '' -ra MY_URLS <<< "$modifiedurl"
-          for URL in "${MY_URLS[@]}"; do
-            if curl --output /dev/null --silent --head --fail "$URL"; then
-              curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$URL" -d "{\"body\": \"$TEXT\"}"
-              echo "Mensaje enviado correctamente a $URL"
-            else
-              echo "No se pudo conectar con $URL. El servidor no está disponible."
-            fi
+          urlscur=$(echo $modifiedurl | tr " " "\n")
+          for url in $urlscur
+          do
+            curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urlscur" -d "{\"body\": \"$TEXT\"}"
           done
-          fi
-
-      #- name: Generate URL for comments
-      #  env:
-          
-     #   run: |
-      #    URL="https://api.github.com/repos/${{ github.repository }}/issues/${{steps.numero-issue.outputs.NUMERO_ISSUE}}/comments"
-       #   curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" $URL -d "{\"body\": \"$TEXT\"}"
