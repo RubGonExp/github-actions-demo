@@ -41,11 +41,13 @@ jobs:
             echo "$body_text"
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
           echo "$issue_numbers"
-          for isnum in "${issue_numbers[@]}"; do
-          urlisnum="https://api.github.com/repos/${{ github.repository }}/issues/$isnum/comments"
+          for issue_number in $issue_numbers; do
+            url="https://github.com/${{ github.repository }}/issues/$issue_number/comments"
+            modified_url=$(echo "$url" | sed "s|https://github.com/|https://api.github.com/repos/|; s|/issues/|/issues/comments/|")
+            echo "$modified_url"
           done
-          echo "$urlisnum"
-          for url in $urlisnum
+          echo "$modified_url"
+          for url in $modified_url
           do
             echo "Enviando comentario a $url"
             URL="$url"
