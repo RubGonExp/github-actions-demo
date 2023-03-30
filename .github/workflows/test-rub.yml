@@ -38,7 +38,7 @@ jobs:
         env:
           TEXT: Hola caracola
         run: |
-          echo "modifiedurl"
+          echo "$modifiedurl"
           for url in $modifiedurl
           do
             echo "Enviando comentario a $url"
