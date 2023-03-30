@@ -24,8 +24,8 @@ jobs:
           urls="$(echo "$body_text" | grep -oP 'https?://[^\s]+\b(?:\([^)]*\))?')"
           echo "$urls"
           for url in "${urls[@]}"; do
-          modified_url=$(echo "$url" | sed 's|https://github.com/|https://api.github.com/repos/|; s|$|/comments|')
-          echo "$modified_url"
+          modifiedurl=$(echo "$url" | sed 's|https://github.com/|https://api.github.com/repos/|; s|$|/comments|')
+          echo "$modifiedurl"
           done
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])')
           if [ -z "$issue_numbers" ]; then
@@ -34,7 +34,6 @@ jobs:
             echo "$issue_numbers"
           fi
           echo "urls=$urls" >> $GITHUB_OUTPUT
-          echo "modified_url=$modified_url" >> $GITHUB_OUTPUT
           
       - name: Obtener número de issue
         id: numero-issue
