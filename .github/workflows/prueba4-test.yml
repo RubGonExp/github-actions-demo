@@ -15,7 +15,7 @@ jobs:
       uses: actions/github-script@v4
       with:
         script: |
-          const issue_number = github.context.payload.pull_request.issue_url.split('/').pop();
+          const issue_number = github.context.pull_request.issue_url.split('/').pop();
           const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
           const { data: issue } = await octokit.issues.get({
             owner: context.repo.owner,
