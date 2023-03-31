@@ -57,10 +57,5 @@ jobs:
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
           for issue_number in $issue_numbers; do
             url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
-            echo "Obteniendo información de $url"
-            response=$(curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" $url)
-            for issue in $(echo $response | jq -c '.[]'); do
-              state=$(echo $issue | jq '.state')
-              echo "Estado del issue $issue_number: $state"
-            done
+            curl -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.state'
           done
