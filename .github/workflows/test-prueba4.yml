@@ -56,8 +56,10 @@ jobs:
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
           for issue_number in $issue_numbers; do
             url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number/comments"
-            echo "Enviando comentario a $url"
+            echo "Obteniendo información de $url"
             response=$(curl -s $url)
-            state=$(echo $response | jq '.state')
-            echo -n "Issue $issue_number state: $state. "
+            for issue in $(echo $response | jq -c '.[]'); do
+              state=$(echo $issue | jq '.state')
+              echo "Estado del issue $issue_number: $state"
+            done
           done
