@@ -58,7 +58,7 @@ jobs:
           for issue_number in $issue_numbers; do
             url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
             echo "Obteniendo información de $url"
-            response=$(curl -s $url)
+            response=$(curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" $url)
             for issue in $(echo $response | jq -c '.[]'); do
               state=$(echo $issue | jq '.state')
               echo "Estado del issue $issue_number: $state"
