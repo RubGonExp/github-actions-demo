@@ -50,12 +50,13 @@ jobs:
         id: get_issue_state
         env:
           TEXT: Text in test of closed pull and issue synchronize
+          
         run: |
           body_text="$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')"
             echo "$body_text"
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
           for issue_number in $issue_numbers; do
-            url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number/comments"
+            url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
             echo "Obteniendo información de $url"
             response=$(curl -s $url)
             for issue in $(echo $response | jq -c '.[]'); do
