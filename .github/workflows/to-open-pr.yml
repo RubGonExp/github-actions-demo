@@ -11,16 +11,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Get Issue State
-        id: get_issue_state
+      - name: PR open labels issues
+        id: pr_open_labeling
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           body_text="$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')"
             echo "$body_text"
+          urls="$(echo "$body_text" | grep -oP 'https://(api\.)?github\.com/[^\s]+\b(?:\([^)]*\))?')"
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
             echo "$issue_numbers"
             echo "$PR_NUMBER"
+            echo "$urls"
           for issue_number in ${issue_numbers[@]}; do
             url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
             state=$(curl -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.state')
