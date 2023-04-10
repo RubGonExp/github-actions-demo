@@ -1,0 +1,73 @@
+name: test rub ok
+
+on:
+  pull_request:
+    types: [open, closed, synchronize]
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  merge-comment:
+    permissions: write-all
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Extract-URL from PR body
+        id: extract-url
+        env:
+          TEXT: Texto de prueba en issue asociado a pull request
+        run: |
+          body_text="$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')"
+          urls="$(echo "$body_text" | grep -oP 'https://(api\.)?github\.com/[^\s]+\b(?:\([^)]*\))?')"
+          for url in "${urls[@]}"; do
+          modifiedurl=$(echo "$url" | sed 's|https://github.com/|https://api.github.com/repos/|; s|$|/comments|')
+          done
+          for url in $modifiedurl
+          do
+            echo "Enviando comentario a $url"
+            URL="$url"
+            curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" -d "{\"body\": \"$TEXT\"}"
+          done
+      - name: Extract-issue-number from PR body
+        id: extract-issuenum
+        env:
+          TEXT: Texto de prueba en issue incluido en un pull request por almohadilla
+        run: |
+          body_text="$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')"
+            echo "$body_text"
+          issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
+          for issue_number in $issue_numbers; do
+            url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number/comments"
+            echo "Enviando comentario a $url"
+            curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" -d "{\"body\": \"$TEXT\"}"
+          done
+      - name: Get Issue State
+        id: get_issue_state
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          body_text="$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')"
+            echo "$body_text"
+          issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
+            echo "$issue_numbers"
+            echo "$PR_NUMBER"
+          for issue_number in ${issue_numbers[@]}; do
+            url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
+            state=$(curl -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.state')
+            echo "$state"
+            echo "$url"
+            if [ "$state" = "closed" ]; then
+              message="Issue closed by PR #$PR_NUMBER"
+              curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"body\": \"$message\"}" "$url/comments"
+            elif [ "$state" = "open" ]; then
+              labels=$(curl -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.labels[].name')
+              echo "$labels"
+              if ! grep -q 'In review' <<< "$labels"; then
+                curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"labels\": [\"In review\"]}" "$url/labels"
+              fi
+            fi
+          done
