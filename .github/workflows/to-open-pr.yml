@@ -24,6 +24,7 @@ jobs:
             states=$(curl -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urls" | jq -r '.state')
             echo "$urls"
             echo "$states"
+          done
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
             echo "$issue_numbers"
             echo "$PR_NUMBER"
