@@ -24,6 +24,16 @@ jobs:
             states=$(curl -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urls" | jq -r '.state')
             echo "$urls"
             echo "$states"
+              if [ "$state" = "closed" ]; then
+                message="Issue closed by PR #$PR_NUMBER"
+                curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"body\": \"$message\"}" "$urls/comments"
+              elif [ "$state" = "open" ]; then
+                labels=$(curl -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urls" | jq -r '.labels[].name')
+                echo "$labels"
+                  if ! grep -q 'In review' <<< "$labels"; then
+                  curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"labels\": [\"In review\"]}" "$urls/labels"
+                  fi
+              fi
           done
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
             echo "$issue_numbers"
