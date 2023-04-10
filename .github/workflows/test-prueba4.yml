@@ -61,14 +61,13 @@ jobs:
             curl -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.state'
             state=$(curl -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.state')
             echo "$state"
-            if [ "$state" = "closed" ]; then
-              message="Issue closed by PR #$PR_NUMBER"
-              curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"body\": \"$message\"}" "$url/comments"
-            elif [ "$state" = "open" ]; then
-              label=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.labels | map(select(.name == "In Review")) | .[0].name')
-                if [ -z "$label" ]; then
-                curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d '{"name":"In Review","color":"009800"}' "https://api.github.com/repos/$GITHUB_REPOSITORY/labels"
-                curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"labels\": [\"In Review\"]}" "$url/labels"
-                fi
-            fi
+              if [ "$state" = "closed" ]; then
+                  message="Issue closed by PR #$PR_NUMBER"
+                  curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"body\": \"$message\"}" "$url/comments"
+              elif [ "$state" = "open" ]; then
+                  label=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.labels | map(select(.name == "In Review")) | .[0].name')
+                  if [ -z "$label" ]; then
+                      curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"labels\": [\"In Review\"]}" "$url/labels"
+                  fi
+              fi
           done
