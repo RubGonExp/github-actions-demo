@@ -18,7 +18,12 @@ jobs:
         run: |
           body_text="$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')"
             echo "$body_text"
-          urls="$(echo "$body_text" | grep -oP 'https://(api\.)?github\.com/[^\s]+\b(?:\([^)]*\))?')"
+          in_prs="$(echo "$body_text" | grep -oP 'https://(api\.)?github\.com/[^\s]+\b(?:\([^)]*\))?')"
+          for in_pr in ${in_prs[@]}; do
+            urls=$(echo "$in_pr" | sed 's|https://github.com/|https://api.github.com/repos/|')
+            states=$(curl -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urls" | jq -r '.state')
+            echo "$urls"
+            echo "$states"
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
             echo "$issue_numbers"
             echo "$PR_NUMBER"
