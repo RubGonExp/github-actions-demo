@@ -1,7 +1,7 @@
 name: test rub ok
 on:
   pull_request:
-    types: [closed, synchronize]
+    types: [closed]
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
