@@ -59,7 +59,7 @@ jobs:
           for issue_number in $issue_numbers; do
             url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
             curl -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.state'
-            state=$(echo "url" | jq -r '.state')
+            state="$(echo "url" | jq -r '.state')"
             echo "$state"
             if [ "$state" = "closed" ]; then
               pr_number=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.pull_request.url' | sed 's|.*/||')
