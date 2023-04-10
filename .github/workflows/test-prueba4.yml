@@ -61,6 +61,7 @@ jobs:
             curl -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.state'
             state=$(curl -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.state')
             echo "$state"
+            echo "$url"
               if [ "$state" = "closed" ]; then
                   message="Issue closed by PR #$PR_NUMBER"
                   curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"body\": \"$message\"}" "$url/comments"
