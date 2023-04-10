@@ -63,11 +63,11 @@ jobs:
             echo "$url"
               if [ "$state" = "closed" ]; then
                   message="Issue closed by PR #$PR_NUMBER"
-                  curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"body\": \"$message\"}" "$url/comments"
+                  curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"body\": \"$message\"}" "$url/comments"
               elif [ "$state" = "open" ]; then
-                  label=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.labels | map(select(.name == "bug")) | .[0].name')
+                  label=$(curl -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.labels | map(select(.name == "bug")) | .[0].name')
                   if [ -z "$label" ]; then
-                      curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"labels\": [\"bug\"]}" "https://github.com/${{ github.repository }}/issues/$issue_number/labels"
+                      curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"labels\": [\"bug\"]}" "https://github.com/${{ github.repository }}/issues/$issue_number/labels"
                   fi
               fi
           done
