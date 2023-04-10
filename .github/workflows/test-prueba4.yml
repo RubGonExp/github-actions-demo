@@ -43,7 +43,6 @@ jobs:
           for issue_number in $issue_numbers; do
             url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number/comments"
             echo "Enviando comentario a $url"
-            URL="$url"
             curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" -d "{\"body\": \"$TEXT\"}"
           done
       - name: Get Issue State
