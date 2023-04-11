@@ -1,4 +1,4 @@
-name: test rub ok
+name: Auto-labeling of Issues on Pull Requests
 on:
   pull_request:
     types: [opened, synchronize]
@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: PR open labels issues
+      - name: Labeling Issues when opening Pull Requests
         id: pr_open_labeling
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
