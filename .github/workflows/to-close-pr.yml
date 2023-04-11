@@ -21,6 +21,10 @@ jobs:
             for in_pr in ${in_prs[@]}; do
               urls=$(echo "$in_pr" | sed 's|https://github.com/|https://api.github.com/repos/|')
               states=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urls" | jq -r '.state')
+              closer=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urls" | jq -r '.closed_by.login')
+              state_reason=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urls" | jq -r '.state_reason')
+              echo "Issue state: $states, Reason: $state_reason"
+              echo $closer
                 if [ "$states" = "closed" ]; then
                   message="Issue closed by PR #$PR_NUMBER"
                   curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"body\": \"$message\"}" "$urls/comments"
