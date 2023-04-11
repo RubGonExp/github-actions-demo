@@ -1,7 +1,7 @@
 name: test rub ok
 on:
   pull_request:
-    types: [open]
+    types: [open, synchronize]
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
@@ -21,28 +21,28 @@ jobs:
           in_prs="$(echo "$body_text" | grep -oP 'https://(api\.)?github\.com/[^\s]+\b(?:\([^)]*\))?')"
             for in_pr in ${in_prs[@]}; do
               urls=$(echo "$in_pr" | sed 's|https://github.com/|https://api.github.com/repos/|')
-              states=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urls" | jq -r '.state')
+              states=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$urls" | jq -r '.state')
                 if [ "$states" = "closed" ]; then
                   message="Issue closed by PR #$PR_NUMBER in [enlace]($PR_URL)"
-                  curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"body\": \"$message\"}" "$urls/comments"
+                  curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$urls/comments"
                 elif [ "$states" = "open" ]; then
-                  labels=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urls" | jq -r '.labels[].name')
+                  labels=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$urls" | jq -r '.labels[].name')
                     if ! grep -q 'In review' <<< "$labels"; then
-                      curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"labels\": [\"In review\"]}" "$urls/labels"
+                      curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"labels\": [\"In review\"]}" "$urls/labels"
                     fi
                 fi
             done
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
             for issue_number in ${issue_numbers[@]}; do
               url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
-              state=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.state')
+              state=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$url" | jq -r '.state')
                 if [ "$state" = "closed" ]; then
                   message="Issue closed by PR #$PR_NUMBER"
-                  curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"body\": \"$message\"}" "$url/comments"
+                  curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$url/comments"
                 elif [ "$state" = "open" ]; then
-                  labels=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.labels[].name')
+                  labels=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$url" | jq -r '.labels[].name')
                     if ! grep -q 'In review' <<< "$labels"; then
-                      curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"labels\": [\"In review\"]}" "$url/labels"
+                      curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"labels\": [\"In review\"]}" "$url/labels"
                     fi
                 fi
             done
