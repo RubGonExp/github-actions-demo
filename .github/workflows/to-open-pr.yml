@@ -15,6 +15,7 @@ jobs:
         id: pr_open_labeling
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
           body_text="$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')"
           in_prs="$(echo "$body_text" | grep -oP 'https://(api\.)?github\.com/[^\s]+\b(?:\([^)]*\))?')"
@@ -22,7 +23,7 @@ jobs:
               urls=$(echo "$in_pr" | sed 's|https://github.com/|https://api.github.com/repos/|')
               states=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urls" | jq -r '.state')
                 if [ "$states" = "closed" ]; then
-                  message="Issue closed by PR #$PR_NUMBER"
+                  message="Issue closed by PR #$PR_NUMBER in [enlace]($PR_URL)"
                   curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"body\": \"$message\"}" "$urls/comments"
                 elif [ "$states" = "open" ]; then
                   labels=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urls" | jq -r '.labels[].name')
