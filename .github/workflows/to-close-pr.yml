@@ -29,7 +29,7 @@ jobs:
                   labels=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$urls" | jq -r '.labels[].name')
                     if grep -q 'In review' <<< "$labels"; then
                       curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$urls/comments"
-                      curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" "${urls}/labels/In review"
+                      curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" "${urls}/labels/In%20review"
                       curl -s -X PATCH -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"state\": \"closed\"}" "$urls"
                     fi
                 fi
@@ -45,7 +45,7 @@ jobs:
                   labels=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$url" | jq -r '.labels[].name')
                     if grep -q 'In review' <<< "$labels"; then
                       curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$urls/comments"
-                      curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" "${url}/labels/In review"
+                      curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" "${url}/labels/In%20review"
                       curl -s -X PATCH -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"state\": \"closed\"}" "$url"
                     fi
                 fi
