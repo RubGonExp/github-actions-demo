@@ -22,7 +22,6 @@ jobs:
             for in_pr in ${in_prs[@]}; do
               urls=$(echo "$in_pr" | sed 's|https://github.com/|https://api.github.com/repos/|')
               states=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$urls" | jq -r '.state')
-              closer=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$urls" | jq -r '.closed_by.login')
                 if [ "$states" = "closed" ]; then
                   message="Issue closed by PR #$PR_NUMBER in [enlace]($PR_URL)"
                   curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$urls/comments"
@@ -42,12 +41,12 @@ jobs:
               state=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$url" | jq -r '.state')
                 if [ "$state" = "closed" ]; then
                   message="Issue closed by PR #$PR_NUMBER in [enlace]($PR_URL)"
-                  curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$urls/comments"
+                  curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$url/comments"
                 elif [ "$state" = "open" ]; then
                   labels=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$url" | jq -r '.labels[].name')
                     if grep -q 'In review' <<< "$labels"; then
                       message="Issue closed by PR #$PR_NUMBER in [enlace]($PR_URL)"
-                      curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$urls/comments"
+                      curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$url/comments"
                       curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" "${url}/labels/In%20review"
                       curl -s -X PATCH -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"state\": \"closed\"}" "$url"
                     fi
