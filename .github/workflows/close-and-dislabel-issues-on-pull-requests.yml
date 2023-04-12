@@ -5,8 +5,8 @@ on:
 env:
   HEADER: Authorization:Bearer ${{ secrets.GITHUB_TOKEN }}
   LABEL_TO_USE: "In review"
-  PR_NUMBER: ${{ github.event.pull_request.number }}
-  PR_URL: ${{ github.event.pull_request.html_url }}
+  PR_NUMBER: "${{ github.event.pull_request.number }}"
+  PR_URL: "${{ github.event.pull_request.html_url }}"
 jobs:
   dislabel-close-issue:
     permissions: write-all
