@@ -4,7 +4,6 @@ on:
     types: [closed, synchronize]
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  LABEL_TO_USE: "In review"
 jobs:
   dislabel-close-issue:
     permissions: write-all
@@ -17,6 +16,7 @@ jobs:
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_URL: ${{ github.event.pull_request.html_url }}
+          LABEL_TO_USE: "In review"
         run: |
           body_text="$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')"
           url_prs="$(echo "$body_text" | grep -oP 'https://(api\.)?github\.com/[^\s]+\b(?:\([^)]*\))?')"
