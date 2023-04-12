@@ -22,9 +22,7 @@ jobs:
           url_prs="$(echo "$body_text" | grep -oP 'https://(api\.)?github\.com/[^\s]+\b(?:\([^)]*\))?')"
           for urls_prs in ${url_prs[@]}; do
             urls=$(echo "$urls_prs" | sed 's|https://github.com/|https://api.github.com/repos/|')
-            states=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$urls" | jq -r '.state')
-            echo "$urls"
-            echo "$states"
+            states=$(curl -s -X GET -H "$HEADER" "$urls" | jq -r '.state')
             if [ "$states" = "closed" ]; then
               message="Issue closed by [$PR_NUMBER]($PR_URL)"
               curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$urls/comments"
@@ -41,9 +39,7 @@ jobs:
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
           for issue_number in ${issue_numbers[@]}; do
             url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
-            state=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$url" | jq -r '.state')
-            echo "$url"
-            echo "$state"
+            state=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.state')
             if [ "$state" = "closed" ]; then
               message="Issue closed by [$PR_NUMBER]($PR_URL)"
               curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$url/comments"
