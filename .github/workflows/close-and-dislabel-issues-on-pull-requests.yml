@@ -4,6 +4,7 @@ on:
     types: [closed, synchronize]
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  LABEL_TO_USE: "In review"
 jobs:
   dislabel-close-issue:
     permissions: write-all
@@ -16,13 +17,14 @@ jobs:
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_URL: ${{ github.event.pull_request.html_url }}
-          LABEL_TO_USE: "In review"
         run: |
           body_text="$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')"
           url_prs="$(echo "$body_text" | grep -oP 'https://(api\.)?github\.com/[^\s]+\b(?:\([^)]*\))?')"
           for urls_prs in ${url_prs[@]}; do
             urls=$(echo "$urls_prs" | sed 's|https://github.com/|https://api.github.com/repos/|')
             states=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$urls" | jq -r '.state')
+            echo "$urls"
+            echo "$states"
             if [ "$states" = "closed" ]; then
               message="Issue closed by [$PR_NUMBER]($PR_URL)"
               curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$urls/comments"
@@ -40,6 +42,8 @@ jobs:
           for issue_number in ${issue_numbers[@]}; do
             url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
             state=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$url" | jq -r '.state')
+            echo "$url"
+            echo "$state"
             if [ "$state" = "closed" ]; then
               message="Issue closed by [$PR_NUMBER]($PR_URL)"
               curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$url/comments"
