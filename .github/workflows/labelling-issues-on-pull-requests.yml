@@ -1,7 +1,7 @@
 name: Auto-labelling of issues on pull requests
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened]
 env:
   HEADER: Authorization:Bearer ${{ secrets.GITHUB_TOKEN }}
   LABEL_TO_USE: "In review"
@@ -33,11 +33,11 @@ jobs:
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
           for issue_number in ${issue_numbers[@]}; do
             url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
-            state=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$url" | jq -r '.state')
+            state=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.state')
             if [ "$state" = "open" ]; then
-              labels=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$url" | jq -r '.labels[].name')
+              labels=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.labels[].name')
               if ! grep -q "$LABEL_TO_USE" <<< "$labels"; then
-                curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"labels\": [\"$LABEL_TO_USE\"]}" "$url/labels"
+                curl -s -X POST -H "$HEADER" -d "{\"labels\": [\"$LABEL_TO_USE\"]}" "$url/labels"
               fi
             fi
           done
