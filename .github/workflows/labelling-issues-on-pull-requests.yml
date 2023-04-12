@@ -24,9 +24,9 @@ jobs:
               urls=$(echo "$urls_prs" | sed 's|https://github.com/|https://api.github.com/repos/|')
               states=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$urls" | jq -r '.state')
                 if [ "$state" = "open" ]; then
-                  labels=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$url" | jq -r '.labels[].name')
+                  labels=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$urls" | jq -r '.labels[].name')
                     if ! grep -q "$LABEL_TO_USE" <<< "$labels"; then
-                      curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"labels\": [\"$LABEL_TO_USE\"]}" "$url/labels"
+                      curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"labels\": [\"$LABEL_TO_USE\"]}" "$urls/labels"
                     fi
                 fi
             done
