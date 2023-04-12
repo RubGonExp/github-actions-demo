@@ -4,7 +4,7 @@ on:
     types: [closed, synchronize]
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  LABEL_TO_USE: "In%20review"
+  LABEL_TO_USE: "In review"
 jobs:
   dislabel-close-issue:
     permissions: write-all
