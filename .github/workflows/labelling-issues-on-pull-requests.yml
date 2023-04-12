@@ -4,6 +4,7 @@ on:
     types: [opened]
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  LABEL_TO_USE: "In review"
 jobs:
   labelling-issue:
     permissions: write-all
@@ -27,8 +28,8 @@ jobs:
                   curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$urls/comments"
                 elif [ "$states" = "open" ]; then
                   labels=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$urls" | jq -r '.labels[].name')
-                    if ! grep -q 'In review' <<< "$labels"; then
-                      curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"labels\": [\"In review\"]}" "$urls/labels"
+                    if ! grep -q "$LABEL_TO_USE" <<< "$labels"; then
+                      curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"labels\": [\"$LABEL_TO_USE\"]}" "$urls/labels"
                     fi
                 fi
             done
@@ -41,8 +42,8 @@ jobs:
                   curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$url/comments"
                 elif [ "$state" = "open" ]; then
                   labels=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$url" | jq -r '.labels[].name')
-                    if ! grep -q 'In review' <<< "$labels"; then
-                      curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"labels\": [\"In review\"]}" "$url/labels"
+                    if ! grep -q "$LABEL_TO_USE" <<< "$labels"; then
+                      curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"labels\": [\"$LABEL_TO_USE\"]}" "$url/labels"
                     fi
                 fi
             done
