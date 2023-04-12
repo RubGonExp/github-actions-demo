@@ -28,7 +28,7 @@ jobs:
                   curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$urls/comments"
                 elif [ "$states" = "open" ]; then
                   labels=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" "$urls" | jq -r '.labels[].name')
-                    if grep -q "$LABEL_TO_USE"' <<< "$labels"; then
+                    if grep -q "$LABEL_TO_USE" <<< "$labels"; then
                       message="Issue closed by [$PR_NUMBER]($PR_URL)"
                       curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -d "{\"body\": \"$message\"}" "$urls/comments"
                       curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" "${urls}/labels/${REVIEW_LABEL}"
