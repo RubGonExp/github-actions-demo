@@ -19,8 +19,11 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
           body_text="$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')"
-          url_prs="$(echo "$body_text" | grep -oP 'https://(api\.)?github\.com/[^\s]+\b(?:\([^)]*\))?')"
           message="Issue closed by PR [#$PR_NUMBER]($PR_URL)"
+          url_prs="$(echo "$body_text" | grep -oP 'https://(api\.)?github\.com/[^\s]+\b(?:\([^)]*\))?')"
+          issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
+          combined="$url_prs:$issue_numbers"
+          echo "$combined"
           for url_pr in ${url_prs[@]}; do
             url=$(echo "$url_pr" | sed 's|https://github.com/|https://api.github.com/repos/|')
             state=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.state')
