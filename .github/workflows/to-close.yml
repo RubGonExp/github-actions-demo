@@ -1,0 +1,54 @@
+
+ 
+
+name: test rub ok
+on:
+  pull_request:
+    types: [closed, synchronize]
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+jobs:
+  merge-comment:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: PR closed dislabel issues
+        id: pr_closed_dislabeling
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          body_text="$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')"
+          in_prs="$(echo "$body_text" | grep -oP 'https://(api\.)?github\.com/[^\s]+\b(?:\([^)]*\))?')"
+            for in_pr in ${in_prs[@]}; do
+              urls=$(echo "$in_pr" | sed 's|https://github.com/|https://api.github.com/repos/|')
+              states=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urls" | jq -r '.state')
+              closer=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urls" | jq -r '.closed_by.login')
+              state_reason=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urls" | jq -r '.state_reason')
+                if [ "$states" = "closed" ]; then
+                  message="Issue closed by PR #$PR_NUMBER by $closer for $state_reason"
+                  curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"body\": \"$message\"}" "$urls/comments"
+                elif [ "$states" = "open" ]; then
+                  labels=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$urls" | jq -r '.labels[].name')
+                    if grep -q 'In review' <<< "$labels"; then
+                      curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "${urls}/labels/In%20review"
+                      curl -s -X PATCH -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"state\": \"closed\"}" "$urls"
+                    fi
+                fi
+            done
+          issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
+            for issue_number in ${issue_numbers[@]}; do
+              url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
+              state=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.state')
+                if [ "$state" = "closed" ]; then
+                  message="Issue closed by PR #$PR_NUMBER"
+                  curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"body\": \"$message\"}" "$url/comments"
+                elif [ "$state" = "open" ]; then
+                  labels=$(curl -s -X GET -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "$url" | jq -r '.labels[].name')
+                    if grep -q 'In review' <<< "$labels"; then
+                      curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "${url}/labels/In%20review"
+                      curl -s -X PATCH -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d "{\"state\": \"closed\"}" "$url"
+                    fi
+                fi
+            done
