@@ -32,11 +32,9 @@ jobs:
               type="issue"
             fi
             state=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.state')
-            if [ "$state" = "open" ]; then
-              if [ "$type" = "url" ] || [ "$type" = "issue" ]; then
+            if [ "$state" = "open" ] && [ "$type" = "url" ] || [ "$type" = "issue" ]; then
                 labels=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.labels[].name')
                 if ! grep -q "$LABEL_TO_USE" <<< "$labels"; then
                 curl -s -X POST -H "$HEADER" -d "{\"labels\": [\"$LABEL_TO_USE\"]}" "$url/labels"
-              fi
             fi
           done
