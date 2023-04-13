@@ -1,6 +1,3 @@
-
- 
-
 name: test rub ok
 on:
   pull_request:
