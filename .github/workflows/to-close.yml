@@ -4,7 +4,7 @@ on:
     types: [closed, synchronize]
 env:
   HEADER: Authorization:Bearer ${{ secrets.GITHUB_TOKEN }}
-  LABEL_TO_USE: "In review"
+  LABEL_TO_USE: "In%20review"
 jobs:
   merge-comment:
     permissions: write-all
@@ -23,7 +23,7 @@ jobs:
             for url_pr in ${url_prs[@]}; do
               urls=$(echo "$url_pr" | sed 's|https://github.com/|https://api.github.com/repos/|')
               states=$(curl -s -X GET -H "$HEADER" "$urls" | jq -r '.state')
-              echo "${urls}/labels/$LABEL_TO_USE | urlencode)"
+              echo "${urls}/labels/$LABEL_TO_USE"
                 if [ "$states" = "closed" ]; then
                   message="Issue closed by PR [#$PR_NUMBER]($PR_URL)"
                   curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$urls/comments"
@@ -32,7 +32,7 @@ jobs:
                   curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$urls/comments"
                   labels=$(curl -s -X GET -H "$HEADER" "$urls" | jq -r '.labels[].name')
                     if grep -q "$LABEL_TO_USE" <<< "$labels"; then
-                      curl -s -X DELETE -H "$HEADER" "${urls}/labels/$(echo "$LABEL_TO_USE" | urlencode)"
+                      curl -s -X DELETE -H "$HEADER" "${urls}/labels/$LABEL_TO_USE"
                       curl -s -X PATCH -H "$HEADER" -d "{\"state\": \"closed\"}" "$urls"
                     fi
                 fi
