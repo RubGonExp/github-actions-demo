@@ -4,8 +4,9 @@ on:
     types: [closed, synchronize]
 env:
   HEADER: Authorization:Bearer ${{ secrets.GITHUB_TOKEN }}
+  LABEL_TO_USE: "In review"
 jobs:
-  merge-comment:
+  dislabel-close-issue:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
@@ -26,11 +27,13 @@ jobs:
                   message="Issue closed by PR [#$PR_NUMBER]($PR_URL)"
                   curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$urls/comments"
                 elif [ "$states" = "open" ]; then
+                  label_url=$(echo "${urls}/labels/$LABEL_TO_USE" | sed 's/ /%20/g')
+                  echo "$label_url"
                   message="Issue closed by [$PR_NUMBER]($PR_URL)"
                   curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$urls/comments"
                   labels=$(curl -s -X GET -H "$HEADER" "$urls" | jq -r '.labels[].name')
-                    if grep -q 'In review' <<< "$labels"; then
-                      curl -s -X DELETE -H "$HEADER" "${urls}/labels/In%20review"
+                    if grep -q "$LABEL_TO_USE" <<< "$labels"; then
+                      curl -s -X DELETE -H "$HEADER" "$label_url"
                       curl -s -X PATCH -H "$HEADER" -d "{\"state\": \"closed\"}" "$urls"
                     fi
                 fi
@@ -46,7 +49,7 @@ jobs:
                   message="Issue closed by PR [#$PR_NUMBER]($PR_URL)"
                   curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments"
                   labels=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.labels[].name')
-                    if grep -q 'In review' <<< "$labels"; then
+                    if grep -q "$LABEL_TO_USE" <<< "$labels"; then
                       curl -s -X DELETE -H "$HEADER" "${url}/labels/In%20review"
                       curl -s -X PATCH -H "$HEADER" -d "{\"state\": \"closed\"}" "$url"
                     fi
