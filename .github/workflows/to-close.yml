@@ -1,7 +1,7 @@
 name: Auto-dislabelling and closing issues on pull requests
 on:
   pull_request:
-    types: [closed, synchronize]
+    types: [closed]
 env:
   HEADER: Authorization:Bearer ${{ secrets.GITHUB_TOKEN }}
   LABEL_TO_USE: "In review"
@@ -33,12 +33,12 @@ jobs:
               type="issue"
             fi
             state=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.state')
-            if [ "$state" = "closed" ] || [ "$state" = "open" ]; then
+            if [ "$state" = "closed" ]; then
               curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments"
             elif [ "$state" = "open" ]; then
+              curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments"
               if [ "$type" = "url" ] || [ "$type" = "issue" ]; then
                 label_url=$(echo "${url}/labels/$LABEL_TO_USE" | sed 's/ /%20/g')
-                echo "$label_url"
                 labels=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.labels[].name')
                 if grep -q "$LABEL_TO_USE" <<< "$labels"; then
                   curl -s -X DELETE -H "$HEADER" "$label_url"
