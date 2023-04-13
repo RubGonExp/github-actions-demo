@@ -27,7 +27,7 @@ jobs:
                   message="Issue closed by PR [#$PR_NUMBER]($PR_URL)"
                   curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$urls/comments"
                 elif [ "$states" = "open" ]; then
-                  label_url=${urls}/labels/$LABEL_TO_USE
+                  label_url=$(echo "${urls}/labels/$LABEL_TO_USE" | sed 's/ /%20/g')
                   echo "$label_url"
                   message="Issue closed by [$PR_NUMBER]($PR_URL)"
                   curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$urls/comments"
