@@ -41,12 +41,10 @@ jobs:
             url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
             state=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.state')
             if [ "$state" = "closed" ]; then
-              message="Issue closed by PR [#$PR_NUMBER]($PR_URL)"
               curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments"
             elif [ "$state" = "open" ]; then
-              label_url=$(echo "${url}/labels/$LABEL_TO_USE" | sed 's/ /%20/g')
-              message="Issue closed by PR [#$PR_NUMBER]($PR_URL)"
               curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments"
+              label_url=$(echo "${url}/labels/$LABEL_TO_USE" | sed 's/ /%20/g')
               labels=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.labels[].name')
               if grep -q "$LABEL_TO_USE" <<< "$labels"; then
                 curl -s -X DELETE -H "$HEADER" "$label_url"
