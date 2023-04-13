@@ -23,7 +23,7 @@ jobs:
             for url_pr in ${url_prs[@]}; do
               urls=$(echo "$url_pr" | sed 's|https://github.com/|https://api.github.com/repos/|')
               states=$(curl -s -X GET -H "$HEADER" "$urls" | jq -r '.state')
-              echo "${urls}/labels/$LABEL_TO_USE"
+              echo "${urls}/labels/$LABEL_TO_USE | urlencode)"
                 if [ "$states" = "closed" ]; then
                   message="Issue closed by PR [#$PR_NUMBER]($PR_URL)"
                   curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$urls/comments"
