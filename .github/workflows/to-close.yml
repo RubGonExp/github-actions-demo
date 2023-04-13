@@ -22,7 +22,7 @@ jobs:
           message="Issue closed by PR [#$PR_NUMBER]($PR_URL)"
           url_prs="$(echo "$body_text" | grep -oP 'https://(api\.)?github\.com/[^\s]+\b(?:\([^)]*\))?')"
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
-          combined="$url_prs:$issue_numbers"
+          combined=$(paste <(echo "$url_prs") <(echo "$issue_numbers"))
           echo "$combined"
           for url_pr in ${url_prs[@]}; do
             url=$(echo "$url_pr" | sed 's|https://github.com/|https://api.github.com/repos/|')
