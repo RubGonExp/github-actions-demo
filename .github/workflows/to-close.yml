@@ -37,6 +37,7 @@ jobs:
               curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments"
             elif [ "$state" = "open" ] && [ "$type" = "url" ] || [ "$type" = "issue" ]; then
               label_url=$(echo "${url}/labels/$LABEL_TO_USE" | sed 's/ /%20/g')
+              echo "$label_url"
               labels=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.labels[].name')
                 if grep -q "$LABEL_TO_USE" <<< "$labels"; then
                   curl -s -X DELETE -H "$HEADER" "$label_url"
