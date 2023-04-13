@@ -24,34 +24,27 @@ jobs:
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
           combined=$(paste <(echo "$url_prs") <(echo "$issue_numbers"))
           echo "$combined"
-          for url_pr in ${url_prs[@]}; do
-            url=$(echo "$url_pr" | sed 's|https://github.com/|https://api.github.com/repos/|')
-            state=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.state')
-            if [ "$state" = "closed" ]; then
-              curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments"
-            elif [ "$state" = "open" ]; then
-              curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments"
-              label_url=$(echo "${url}/labels/$LABEL_TO_USE" | sed 's/ /%20/g')
-              labels=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.labels[].name')
-              if grep -q "$LABEL_TO_USE" <<< "$labels"; then
-                curl -s -X DELETE -H "$HEADER" "$label_url"
-                curl -s -X PATCH -H "$HEADER" -d "{\"state\": \"closed\"}" "$url"
-              fi
+          for combined_item in ${combined[@]}; do
+            if [[ "$combined_item" =~ ^http ]]; then
+              url=$(echo "$combined_item" | sed 's|https://github.com/|https://api.github.com/repos/|')
+              type="url"
+            else
+              issue_number="$combined_item"
+              url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
+              type="issue"
             fi
-          done
-          issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
-          for issue_number in ${issue_numbers[@]}; do
-            url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
             state=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.state')
             if [ "$state" = "closed" ]; then
               curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments"
             elif [ "$state" = "open" ]; then
               curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments"
-              label_url=$(echo "${url}/labels/$LABEL_TO_USE" | sed 's/ /%20/g')
-              labels=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.labels[].name')
-              if grep -q "$LABEL_TO_USE" <<< "$labels"; then
-                curl -s -X DELETE -H "$HEADER" "$label_url"
-                curl -s -X PATCH -H "$HEADER" -d "{\"state\": \"closed\"}" "$url"
+              if [ "$type" = "url" ]; then
+                label_url=$(echo "${url}/labels/$LABEL_TO_USE" | sed 's/ /%20/g')
+                labels=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.labels[].name')
+                if grep -q "$LABEL_TO_USE" <<< "$labels"; then
+                  curl -s -X DELETE -H "$HEADER" "$label_url"
+                  curl -s -X PATCH -H "$HEADER" -d "{\"state\": \"closed\"}" "$url"
+                fi
               fi
             fi
           done
