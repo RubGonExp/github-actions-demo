@@ -4,7 +4,7 @@ on:
     types: [closed, synchronize]
 env:
   HEADER: Authorization:Bearer ${{ secrets.GITHUB_TOKEN }}
-  LABEL_TO_USE: In%20review
+  LABEL_TO_USE: In review
 jobs:
   merge-comment:
     permissions: write-all
