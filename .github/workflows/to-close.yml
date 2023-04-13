@@ -23,16 +23,17 @@ jobs:
             for url_pr in ${url_prs[@]}; do
               urls=$(echo "$url_pr" | sed 's|https://github.com/|https://api.github.com/repos/|')
               states=$(curl -s -X GET -H "$HEADER" "$urls" | jq -r '.state')
-              echo "${urls}/labels/${{ env.LABEL_TO_USE }}"
                 if [ "$states" = "closed" ]; then
                   message="Issue closed by PR [#$PR_NUMBER]($PR_URL)"
                   curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$urls/comments"
                 elif [ "$states" = "open" ]; then
+                  label_url=${urls}/labels/$LABEL_TO_USE
+                  echo "$label_url"
                   message="Issue closed by [$PR_NUMBER]($PR_URL)"
                   curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$urls/comments"
                   labels=$(curl -s -X GET -H "$HEADER" "$urls" | jq -r '.labels[].name')
                     if grep -q "$LABEL_TO_USE" <<< "$labels"; then
-                      curl -s -X DELETE -H "$HEADER" "${urls}/labels/$LABEL_TO_USE"
+                      curl -s -X DELETE -H "$HEADER" "$label_url"
                       curl -s -X PATCH -H "$HEADER" -d "{\"state\": \"closed\"}" "$urls"
                     fi
                 fi
