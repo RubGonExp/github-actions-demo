@@ -20,11 +20,11 @@ jobs:
         run: |
           body_text="$(echo "${{ github.event.pull_request.body }}" | tr -d '\r\n')"
           url_prs="$(echo "$body_text" | grep -oP 'https://(api\.)?github\.com/[^\s]+\b(?:\([^)]*\))?')"
+          message="Issue closed by PR [#$PR_NUMBER]($PR_URL)"
           for url_pr in ${url_prs[@]}; do
             url=$(echo "$url_pr" | sed 's|https://github.com/|https://api.github.com/repos/|')
             state=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.state')
             if [ "$state" = "closed" ]; then
-              message="Issue closed by PR [#$PR_NUMBER]($PR_URL)"
               curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments"
             elif [ "$state" = "open" ]; then
               label_url=$(echo "${url}/labels/$LABEL_TO_USE" | sed 's/ /%20/g')
