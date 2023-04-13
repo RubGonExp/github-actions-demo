@@ -4,7 +4,7 @@ on:
     types: [closed, synchronize]
 env:
   HEADER: Authorization:Bearer ${{ secrets.GITHUB_TOKEN }}
-  LABEL_TO_USE: "In review"
+  LABEL_TO_USE: "In+review"
 jobs:
   dislabel-close-issue:
     permissions: write-all
@@ -32,7 +32,7 @@ jobs:
                   curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$urls/comments"
                   labels=$(curl -s -X GET -H "$HEADER" "$urls" | jq -r '.labels[].name')
                     if grep -q "$LABEL_TO_USE" <<< "$labels"; then
-                      curl -s -X DELETE -H "$HEADER" "${urls}/labels/${LABEL_TO_USE// /\\ }"
+                      curl -s -X DELETE -H "$HEADER" "${urls}/labels/$LABEL_TO_USE"
                       curl -s -X PATCH -H "$HEADER" -d "{\"state\": \"closed\"}" "$urls"
                     fi
                 fi
