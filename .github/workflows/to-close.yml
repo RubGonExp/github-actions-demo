@@ -23,13 +23,12 @@ jobs:
           url_prs=$(echo "$body_text" | grep -oP 'https://(api\.)?github\.com/[^\s]+\b(?:\([^)]*\))?')
           issue_numbers=$(echo "$body_text" | grep -oP '(?<!\[)#(\d+)(?!\])' | sed 's/#//')
           combined=$(paste <(echo "$url_prs") <(echo "$issue_numbers"))
-          echo "$combined"
-          for combined_item in ${combined[@]}; do
-            if [[ "$combined_item" =~ ^http ]]; then
-              url=$(echo "$combined_item" | sed 's|https://github.com/|https://api.github.com/repos/|')
+          for combined_url in ${combined[@]}; do
+            if [[ "$combined_url" =~ ^http ]]; then
+              url=$(echo "$combined_url" | sed 's|https://github.com/|https://api.github.com/repos/|')
               type="url"
             else
-              issue_number="$combined_item"
+              issue_number="$combined_url"
               url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
               type="issue"
             fi
