@@ -33,10 +33,11 @@ jobs:
               type="issue"
             fi
             state=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.state')
+            send_comment=$(curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments")
             if [ "$state" = "closed" ]; then
-              curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments"
+              $send_comment
             elif [ "$state" = "open" ]; then
-              curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments"
+              $send_comment
               curl -s -X PATCH -H "$HEADER" -d "{\"state\": \"closed\"}" "$url"
               if [ "$type" = "url" ] || [ "$type" = "issue" ]; then
                 label_url=$(echo "${url}/labels/$LABEL_TO_USE" | sed 's/ /%20/g')
