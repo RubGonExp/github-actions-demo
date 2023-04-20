@@ -30,9 +30,8 @@ jobs:
               url="https://api.github.com/repos/${{ github.repository }}/issues/$issue_number"
             fi
             state=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.state')
-            if [ "$state" = "closed" ]; then
-              curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments"
-            elif [ "$state" = "open" ]; then
+            curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments"
+            if [ "$state" = "open" ]; then
               label_url=$(echo "${url}/labels/$LABEL_TO_USE" | sed 's/ /%20/g')
               labels=$(curl -s -X GET -H "$HEADER" "$url" | jq -r '.labels[].name')
               curl -s -X POST -H "$HEADER" -d "{\"body\": \"$message\"}" "$url/comments"
